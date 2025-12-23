@@ -1,29 +1,45 @@
-# 🎃 PumpkinGarden CTF Writeup
-
-This repository contains a complete walkthrough and proof-of-concept for the PumpkinGarden CTF. This project demonstrates network scanning, web enumeration, and Linux privilege escalation using a documented Sudo exploit to gain root access and retrieve the final key.
+# 🎃 PumpkinGarden-CTF-Writeup
+Complete walkthrough and proof-of-concept for the PumpkinGarden CTF. This project demonstrates network scanning, web enumeration, and Linux privilege escalation using a documented Sudo exploit to gain root access and retrieve the final key.
 
 ---
 
 ## 🔍 Phase 1: Scanning & Enumeration
-[cite_start]First, I identified the target machine at IP `192.168.56.106`[cite: 4].
-* [cite_start]**Nmap Scan**: Revealed services on Port 21 (FTP), Port 1515 (HTTP), and Port 3535 (SSH)[cite: 8, 11].
-* [cite_start]**Web Discovery**: Found a hidden directory at `/img/hidden_secret/` containing a `clue.txt` file[cite: 17].
+[cite_start]I identified the target system at IP `192.168.56.106`[cite: 4].
+* [cite_start]**Network Discovery**: Running `nmap -sn` confirmed the host was up[cite: 4, 5].
+![Host Discovery](image001.png)
+
+* [cite_start]**Service Scanning**: A deeper Nmap scan revealed FTP (Port 21), HTTP (Port 1515), and SSH (Port 3535)[cite: 8, 9].
+![Port Scan](image002.png)
+
+* [cite_start]**Web Enumeration**: Exploring the web server revealed an `/img/` directory and a hidden secret path containing `clue.txt`[cite: 17, 21, 24].
+![Hidden Directory](image007.png)
+
+---
 
 ## 🔓 Phase 2: Gaining Access
-* [cite_start]**Decoding**: The `clue.txt` file held Base64-encoded credentials[cite: 20]. 
-* [cite_start]**Initial Shell**: I used these to log in via SSH as user `scarecrow`, then pivoted to user `goblin`[cite: 23, 34].
+* [cite_start]**Decoding Credentials**: The `clue.txt` file held Base64-encoded credentials which were decoded for SSH access[cite: 20].
+![Clue Discovery](image009.png)
+
+* [cite_start]**Initial Shell**: I successfully logged in via SSH as the user `goblin`[cite: 34].
+![SSH Login](image011.png)
+
+---
 
 ## ⚡ Phase 3: Privilege Escalation
-Once logged in as `goblin`, I discovered a path to become the root user:
-* [cite_start]**Exploit**: Used a documented Sudo local root exploit (Tod Miller)[cite: 28, 35].
-* [cite_start]**Result**: Successfully gained a root shell and retrieved the **PumpkinGarden_Key**[cite: 32, 38].
+[cite_start]Once inside, I identified an outdated Sudo version vulnerable to the Tod Miller local root exploit[cite: 28, 35].
+![Sudo Exploit Script](image013.png)
+
+* [cite_start]**Execution**: After synchronizing the script with the system's cleanup intervals, I successfully gained a root shell[cite: 31, 37].
+![Root Shell Access](image015.png)
+
+* [cite_start]**The Flag**: With root privileges, I accessed the `/root` directory and retrieved the final key[cite: 38].
+![Final Flag](image017.png)
 
 ---
 
 ## 📚 Technical Glossary
-* **Nmap**: A tool used to "knock on the doors" of a computer to see which services (like FTP or SSH) are open.
-* [cite_start]**FTP (File Transfer Protocol)**: A way to move files between computers; in this case, it allowed "Anonymous" access, which was a major security hole[cite: 13, 14].
-* **Base64**: A way of encoding data into text. It isn't encryption (secret), it's just a different format that I had to decode to find the password.
-* **SSH (Secure Shell)**: A secure way to log into another computer’s command line.
-* **Root (LordPumpkin)**: The "God Mode" of a Linux system. [cite_start]Having root access means you have total control over the machine[cite: 26, 38].
-* [cite_start]**Privilege Escalation**: The process of starting as a normal user (like `goblin`) and finding a "glitch" to become the admin (root)[cite: 25, 31].
+* **Nmap**: A tool used to "knock on the doors" of a computer to see which services are open.
+* [cite_start]**FTP**: A protocol that allowed "Anonymous" login in this challenge, providing an initial entry point[cite: 13, 15].
+* [cite_start]**Base64**: An encoding format used to hide credentials in `clue.txt`[cite: 20].
+* [cite_start]**Root (LordPumpkin)**: The administrative user with total control over the machine[cite: 26, 32].
+* [cite_start]**Privilege Escalation**: The process of moving from a low-privileged user (goblin) to root[cite: 25, 31].
